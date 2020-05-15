@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class AdvertisementMain implements Commands {
-    private static final String FILE_NAME = "src\\main\\resources\\Item.xlsx";
+    private static String fileName = null;
     private static Scanner scanner = new Scanner(System.in);
     private static DataStorage dataStorage = new DataStorage();
     private static User currentUser = null;
@@ -60,6 +60,7 @@ public class AdvertisementMain implements Commands {
     private static void importFromXlsx() {
         System.out.println("Please xlsx path");
         String xlsxpath = scanner.nextLine();
+        fileName = xlsxpath;
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(xlsxpath);
             Sheet sheet = workbook.getSheetAt(0);
@@ -264,6 +265,9 @@ public class AdvertisementMain implements Commands {
     }
 
     private static void exportItem() {
+        if (fileName == null) {
+            System.out.println("please input xlsx path");
+            fileName = scanner.nextLine();
 
 
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -304,7 +308,7 @@ public class AdvertisementMain implements Commands {
 
         }
         try {
-            FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+            FileOutputStream outputStream = new FileOutputStream(fileName);
             workbook.write(outputStream);
             workbook.close();
         } catch (FileNotFoundException e) {
@@ -312,10 +316,9 @@ public class AdvertisementMain implements Commands {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         System.out.println("exported");
     }
-
+    }
 
 }
 
