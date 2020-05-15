@@ -270,54 +270,54 @@ public class AdvertisementMain implements Commands {
             fileName = scanner.nextLine();
 
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet("Item");
-        List<Item> items = dataStorage.itemsForUser(currentUser);
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Item");
+            List<Item> items = dataStorage.itemsForUser(currentUser);
 
-        String title0 = "Title";
-        String text0 = "Text";
-        String price0 = "Price";
-        String category0 = "Category";
-        int rowNum = 0;
+            String title0 = "Title";
+            String text0 = "Text";
+            String price0 = "Price";
+            String category0 = "Category";
+            int rowNum = 0;
 
-        Row row0 = sheet.createRow(rowNum++);
-        Cell cell0 = row0.createCell(0);
-        cell0.setCellValue(title0);
-        Cell cell01 = row0.createCell(1);
-        cell01.setCellValue(text0);
-        Cell cell02 = row0.createCell(2);
-        cell02.setCellValue(price0);
-        Cell cell03 = row0.createCell(3);
-        cell03.setCellValue(category0);
+            Row row0 = sheet.createRow(rowNum++);
+            Cell cell0 = row0.createCell(0);
+            cell0.setCellValue(title0);
+            Cell cell01 = row0.createCell(1);
+            cell01.setCellValue(text0);
+            Cell cell02 = row0.createCell(2);
+            cell02.setCellValue(price0);
+            Cell cell03 = row0.createCell(3);
+            cell03.setCellValue(category0);
 
-        for (Item item : items) {
-            Row row = sheet.createRow(rowNum++);
+            for (Item item : items) {
+                Row row = sheet.createRow(rowNum++);
 
-            String title = item.getTitle();
-            Cell cell = row.createCell(0);
-            cell.setCellValue(title);
-            Cell cell1 = row.createCell(1);
-            String text = item.getText();
-            cell1.setCellValue(text);
-            Cell cell2 = row.createCell(2);
-            Double price = item.getPrice();
-            cell2.setCellValue(price);
-            Cell cell3 = row.createCell(3);
-            Category category = item.getCategory();
-            cell3.setCellValue((String.valueOf(category)));
+                String title = item.getTitle();
+                Cell cell = row.createCell(0);
+                cell.setCellValue(title);
+                Cell cell1 = row.createCell(1);
+                String text = item.getText();
+                cell1.setCellValue(text);
+                Cell cell2 = row.createCell(2);
+                Double price = item.getPrice();
+                cell2.setCellValue(price);
+                Cell cell3 = row.createCell(3);
+                Category category = item.getCategory();
+                cell3.setCellValue((String.valueOf(category)));
 
+            }
+            try {
+                FileOutputStream outputStream = new FileOutputStream(fileName);
+                workbook.write(outputStream);
+                workbook.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("exported");
         }
-        try {
-            FileOutputStream outputStream = new FileOutputStream(fileName);
-            workbook.write(outputStream);
-            workbook.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("exported");
-    }
     }
 
 }
