@@ -182,6 +182,7 @@ public class AdvertisementMain implements Commands {
                     break;
                 case EXPORTITEM:
                     exportItem();
+                    break;
                 default:
                     System.out.println("Wrong command!");
             }
