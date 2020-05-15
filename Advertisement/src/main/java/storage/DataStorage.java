@@ -4,7 +4,6 @@ import model.Category;
 import model.Item;
 import model.User;
 
-import java.io.IOException;
 import java.util.*;
 
 public class DataStorage {
@@ -29,7 +28,7 @@ public class DataStorage {
 
     }
 
-    public void add(Item item)  {
+    public void add(Item item) {
         item.setId(itemId++);
         items.add(item);
         FileUtil.serializeItem(items);
@@ -71,6 +70,7 @@ public class DataStorage {
     public void printItemsOrderByDate() {
         List<Item> orderedList = new ArrayList<>(items);
 //        orderedList.sort(Comparator.comparing(Item::getCreatedDate));
+
         orderedList.sort(new Comparator<Item>() {
             @Override
             public int compare(Item o1, Item o2) {
@@ -116,5 +116,16 @@ public class DataStorage {
         FileUtil.serializeItem(items);
     }
 
+    public List<Item> itemsForUser(User user) {
+        List<Item> items1 = new ArrayList<>();
+        Iterator<Item> iterator = items.iterator();
+        while (iterator.hasNext()) {
+            Item next = iterator.next();
+            if (next.getUser().equals(user)) {
 
+                items1.add(next);
+            }
+        }
+        return items1;
+    }
 }

@@ -1,23 +1,33 @@
-package main;
 
+import commands.Commands;
 import model.Category;
 import model.Gender;
 import model.Item;
 import model.User;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import storage.DataStorage;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 
 public class AdvertisementMain implements Commands {
-
+    private static final String FILE_NAME = "src\\main\\resources\\Item.xlsx";
     private static Scanner scanner = new Scanner(System.in);
     private static DataStorage dataStorage = new DataStorage();
     private static User currentUser = null;
+    private static XSSFWorkbook workbook = null;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         dataStorage.initData();
         boolean isRun = true;
         while (isRun) {
@@ -38,9 +48,49 @@ public class AdvertisementMain implements Commands {
                 case REGISTER:
                     registerUser();
                     break;
+                case IMPORT_USERS:
+                    importFromXlsx();
+                    break;
                 default:
                     System.out.println("Wrong command!");
             }
+        }
+    }
+
+    private static void importFromXlsx() {
+        System.out.println("Please xlsx path");
+        String xlsxpath = scanner.nextLine();
+        try {
+            XSSFWorkbook workbook = new XSSFWorkbook(xlsxpath);
+            Sheet sheet = workbook.getSheetAt(0);
+            int lastRovNum = sheet.getLastRowNum();
+            for (int i = 1; i <= lastRovNum; i++) {
+                Row row = sheet.getRow(i);
+                String name = row.getCell(0).getStringCellValue();
+                String surName = row.getCell(1).getStringCellValue();
+                Double age = row.getCell(2).getNumericCellValue();
+                Gender gender = Gender.valueOf(row.getCell(3).getStringCellValue());
+                Cell phonenumber = row.getCell(4);
+                String phoneNumberstr = phonenumber.getCellType() == CellType.NUMERIC ?
+                        String.valueOf(Double.valueOf(phonenumber.getNumericCellValue()).intValue()) : phonenumber.getStringCellValue();
+                Cell password = row.getCell(5);
+                String passwordstr = password.getCellType() == CellType.NUMERIC ?
+                        String.valueOf(Double.valueOf(password.getNumericCellValue()).intValue()) : password.getStringCellValue();
+
+                User user = new User();
+                user.setName(name);
+                user.setSurname(surName);
+                user.setAge(age.intValue());
+                user.setGender(gender);
+                user.setPhoneNumber(phoneNumberstr);
+                user.setPassword(passwordstr);
+                System.out.println(user);
+                dataStorage.add(user);
+                System.out.println("import was seccess");
+            }
+        } catch (IOException e) {
+            System.out.println("error while importing users");
+            e.printStackTrace();
         }
     }
 
@@ -126,9 +176,44 @@ public class AdvertisementMain implements Commands {
                 case DELETE_AD_BY_ID:
                     deleteById();
                     break;
+                case IMPORT_ITEMS:
+                    importForItems();
+                    break;
+                case EXPORTITEM:
+                    exportItem();
                 default:
                     System.out.println("Wrong command!");
             }
+        }
+    }
+
+    private static void importForItems() {
+        System.out.println("Please xlsx path ");
+        String xlsxpath = scanner.nextLine();
+        try {
+            workbook = new XSSFWorkbook(xlsxpath);
+            Sheet sheet = workbook.getSheetAt(0);
+            int lastRovNum = sheet.getLastRowNum();
+            for (int i = 1; i <= lastRovNum; i++) {
+                Row row = sheet.getRow(i);
+                String title = row.getCell(0).getStringCellValue();
+                String text = row.getCell(1).getStringCellValue();
+                Double prise = row.getCell(2).getNumericCellValue();
+                Category category = Category.valueOf(row.getCell(3).getStringCellValue());
+                Item item = new Item();
+                item.setTitle(title);
+                item.setText(text);
+                item.setPrice(prise);
+                item.setCategory(category);
+                item.setCreatedDate(new Date());
+                item.setUser(currentUser);
+                System.out.println(item);
+                dataStorage.add(item);
+                System.out.println("import was seccess");
+            }
+        } catch (IOException e) {
+            System.out.println(" error ");
+            e.printStackTrace();
         }
     }
 
@@ -175,6 +260,63 @@ public class AdvertisementMain implements Commands {
             System.out.println("Wrong Data!");
         }
 
+
     }
 
+    private static void exportItem() {
+
+
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Item");
+        List<Item> items = dataStorage.itemsForUser(currentUser);
+
+        String title0 = "Title";
+        String text0 = "Text";
+        String price0 = "Price";
+        String category0 = "Category";
+        int rowNum = 0;
+
+        Row row0 = sheet.createRow(rowNum++);
+        Cell cell0 = row0.createCell(0);
+        cell0.setCellValue(title0);
+        Cell cell01 = row0.createCell(1);
+        cell01.setCellValue(text0);
+        Cell cell02 = row0.createCell(2);
+        cell02.setCellValue(price0);
+        Cell cell03 = row0.createCell(3);
+        cell03.setCellValue(category0);
+
+        for (Item item : items) {
+            Row row = sheet.createRow(rowNum++);
+
+            String title = item.getTitle();
+            Cell cell = row.createCell(0);
+            cell.setCellValue(title);
+            Cell cell1 = row.createCell(1);
+            String text = item.getText();
+            cell1.setCellValue(text);
+            Cell cell2 = row.createCell(2);
+            Double price = item.getPrice();
+            cell2.setCellValue(price);
+            Cell cell3 = row.createCell(3);
+            Category category = item.getCategory();
+            cell3.setCellValue((String.valueOf(category)));
+
+        }
+        try {
+            FileOutputStream outputStream = new FileOutputStream(FILE_NAME);
+            workbook.write(outputStream);
+            workbook.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("exported");
+    }
+
+
 }
+
+
