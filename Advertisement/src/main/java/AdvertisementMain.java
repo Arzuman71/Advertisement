@@ -26,6 +26,7 @@ public class AdvertisementMain implements Commands {
     private static DataStorage dataStorage = new DataStorage();
     private static User currentUser = null;
     private static XSSFWorkbook workbook = null;
+       private static ForTread forTread;
 
     public static void main(String[] args) {
         dataStorage.initData();
@@ -132,12 +133,12 @@ public class AdvertisementMain implements Commands {
                 System.out.println("Wrong phoneNumber or password");
             }
 
-        } catch (ArrayIndexOutOfBoundsException | IOException e) {
+        } catch (ArrayIndexOutOfBoundsException | IOException | InterruptedException e) {
             System.out.println("Wrong Data!");
         }
     }
 
-    private static void loginSuccess() throws IOException {
+    private static void loginSuccess() throws IOException, InterruptedException {
         System.out.println("Welcome " + currentUser.getName() + "!");
         boolean isRun = true;
         while (isRun) {
@@ -151,11 +152,12 @@ public class AdvertisementMain implements Commands {
             switch (command) {
                 case LOGOUT:
                     isRun = false;
+                      forTread.thread.join();
                     break;
                 case ADD_NEW_AD:
                     addNewItem();
                     if (fileName != null) {
-                        ForTread test =new ForTread(fileName,currentUser);
+                        forTread = new ForTread(fileName, currentUser);
                     }
                     break;
                 case PRINT_MY_ADS:
@@ -194,7 +196,7 @@ public class AdvertisementMain implements Commands {
     private static void importForItems() {
         System.out.println("Please xlsx path ");
         String xlsxpath = scanner.nextLine();
-        fileName=xlsxpath;
+        fileName = xlsxpath;
         try {
             workbook = new XSSFWorkbook(xlsxpath);
             Sheet sheet = workbook.getSheetAt(0);
@@ -210,7 +212,7 @@ public class AdvertisementMain implements Commands {
                 item.setText(text);
                 item.setPrice(prise);
                 item.setCategory(category);
-               // item.setCreatedDate(new Date());
+                // item.setCreatedDate(new Date());
                 item.setUser(currentUser);
                 System.out.println(item);
                 dataStorage.add(item);
@@ -323,7 +325,8 @@ public class AdvertisementMain implements Commands {
             System.out.println("exported");
         }
     }
-    public static List<Item> itemsForUsers(){
+
+    public static List<Item> itemsForUsers() {
         return dataStorage.itemsForUser(currentUser);
     }
 
