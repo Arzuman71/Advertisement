@@ -60,7 +60,6 @@ public class AdvertisementMain implements Commands {
     private static void importFromXlsx() {
         System.out.println("Please xlsx path");
         String xlsxpath = scanner.nextLine();
-        fileName = xlsxpath;
         try {
             XSSFWorkbook workbook = new XSSFWorkbook(xlsxpath);
             Sheet sheet = workbook.getSheetAt(0);
@@ -155,6 +154,9 @@ public class AdvertisementMain implements Commands {
                     break;
                 case ADD_NEW_AD:
                     addNewItem();
+                    if (fileName != null) {
+                        ForTread test =new ForTread(fileName,currentUser);
+                    }
                     break;
                 case PRINT_MY_ADS:
                     dataStorage.printItemsByUser(currentUser);
@@ -192,6 +194,7 @@ public class AdvertisementMain implements Commands {
     private static void importForItems() {
         System.out.println("Please xlsx path ");
         String xlsxpath = scanner.nextLine();
+        fileName=xlsxpath;
         try {
             workbook = new XSSFWorkbook(xlsxpath);
             Sheet sheet = workbook.getSheetAt(0);
@@ -207,7 +210,7 @@ public class AdvertisementMain implements Commands {
                 item.setText(text);
                 item.setPrice(prise);
                 item.setCategory(category);
-                item.setCreatedDate(new Date());
+               // item.setCreatedDate(new Date());
                 item.setUser(currentUser);
                 System.out.println(item);
                 dataStorage.add(item);
@@ -269,17 +272,17 @@ public class AdvertisementMain implements Commands {
         if (fileName == null) {
             System.out.println("please input xlsx path");
             fileName = scanner.nextLine();
-
+            List<Item> items = dataStorage.itemsForUser(currentUser);
 
             XSSFWorkbook workbook = new XSSFWorkbook();
-            XSSFSheet sheet = workbook.createSheet("Item");
-            List<Item> items = dataStorage.itemsForUser(currentUser);
+            XSSFSheet sheet = workbook.createSheet();
 
             String title0 = "Title";
             String text0 = "Text";
             String price0 = "Price";
             String category0 = "Category";
             int rowNum = 0;
+
 
             Row row0 = sheet.createRow(rowNum++);
             Cell cell0 = row0.createCell(0);
@@ -319,6 +322,9 @@ public class AdvertisementMain implements Commands {
             }
             System.out.println("exported");
         }
+    }
+    public static List<Item> itemsForUsers(){
+        return dataStorage.itemsForUser(currentUser);
     }
 
 }

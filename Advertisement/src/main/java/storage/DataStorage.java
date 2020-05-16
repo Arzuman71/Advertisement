@@ -3,7 +3,14 @@ package storage;
 import model.Category;
 import model.Item;
 import model.User;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 public class DataStorage {
@@ -11,6 +18,7 @@ public class DataStorage {
     private static long itemId = 1;
     private Map<String, User> userMap = new HashMap<>();
     private List<Item> items = new ArrayList<>();
+
 
     public void initData() {
 
@@ -32,7 +40,9 @@ public class DataStorage {
         item.setId(itemId++);
         items.add(item);
         FileUtil.serializeItem(items);
+
     }
+
 
     public User getUser(String phoneNumber) {
         try {
@@ -128,4 +138,7 @@ public class DataStorage {
         }
         return items1;
     }
+
+
 }
+
